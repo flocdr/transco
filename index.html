@@ -8,9 +8,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600&display=swap">
 <style>
-/* Layout : quatre onglets. Le premier porte un canevas type Obsidian (grille pointillée, cartes,
+/* Layout : cinq onglets. Le premier porte un canevas type Obsidian (grille pointillée, cartes,
    liaisons) sur des zones teintées qui disent où vivent les données. Les autres sont du texte
-   structuré. Un panneau à droite donne la fiche de l'élément survolé. */
+   structuré. */
 :root {
   --bg: #f5f7fa;
   --surface: #ffffff;
@@ -20,7 +20,6 @@
   --dot: #c9d1db;
   --brand: #004e8c;
   --edge: #7a8797;
-  --hl: #fff3b0;
 
   --z-bc: #e6eef7;   --k-bc: #004e8c;
   --z-sp: #e4f3f1;   --k-sp: #0f7c73;
@@ -39,7 +38,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0f151c; --surface: #18212c; --fg: #e6ebf1; --muted: #9aa6b4; --line: #2c3845; --dot: #26313d;
-    --brand: #6fb2ec; --edge: #8795a6; --hl: #3b3413;
+    --brand: #6fb2ec; --edge: #8795a6;
     --z-bc: #13253a; --k-bc: #7bb6ec;
     --z-sp: #10302d; --k-sp: #5fcbbd;
     --z-dk: #1a212b; --k-dk: #b3bfcd;
@@ -54,7 +53,7 @@
 }
 :root[data-theme="dark"] {
   --bg: #0f151c; --surface: #18212c; --fg: #e6ebf1; --muted: #9aa6b4; --line: #2c3845; --dot: #26313d;
-  --brand: #6fb2ec; --edge: #8795a6; --hl: #3b3413;
+  --brand: #6fb2ec; --edge: #8795a6;
   --z-bc: #13253a; --k-bc: #7bb6ec;
   --z-sp: #10302d; --k-sp: #5fcbbd;
   --z-dk: #1a212b; --k-dk: #b3bfcd;
@@ -94,11 +93,6 @@ code { font: 14px/1.4 ui-monospace, "Cascadia Mono", Consolas, monospace; backgr
 .panel { display: grid; gap: 28px; }
 .lead { max-width: 72ch; color: var(--muted); }
 
-/* Éléments qui ont une fiche */
-[data-i] { cursor: help; text-decoration: underline dotted var(--edge); text-underline-offset: 3px; border-radius: 3px; }
-[data-i]:hover, [data-i]:focus-visible, [data-i].on { background: var(--hl); outline: none; }
-.node .step[data-i], .chips [data-i], .src[data-i] { text-decoration: none; }
-
 /* Canevas */
 .canvas-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
 .canvas {
@@ -107,8 +101,8 @@ code { font: 14px/1.4 ui-monospace, "Cascadia Mono", Consolas, monospace; backgr
   background-size: 22px 22px;
 }
 .hint { font-size: 13px; color: var(--muted); margin-top: 6px; }
-.hint .narrow { display: none; }
-@media (max-width: 1260px) { .hint .narrow { display: inline; } }
+.hint.narrow { display: none; }
+@media (max-width: 1260px) { .hint.narrow { display: block; } }
 
 .zone { position: absolute; border-radius: 14px; }
 .zone .tag { position: absolute; left: 14px; top: 10px; font: 600 12px/1.2 var(--f-display); letter-spacing: .1em; text-transform: uppercase; }
@@ -134,7 +128,6 @@ code { font: 14px/1.4 ui-monospace, "Cascadia Mono", Consolas, monospace; backgr
 
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .chips span { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; font-size: 13px; background: var(--bg); }
-.chips span:hover, .chips span.on { background: var(--hl); }
 
 svg.edges { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .edges path { fill: none; stroke: var(--edge); stroke-width: 1.6; stroke-linecap: round; }
@@ -160,7 +153,6 @@ svg.edges { position: absolute; inset: 0; width: 100%; height: 100%; pointer-eve
 .src.sp { background: var(--z-sp); color: var(--k-sp); }
 .src.pa { background: var(--z-pa); color: var(--k-pa); }
 .src.bi { background: var(--z-bi); color: var(--k-bi); }
-.src[data-i]:hover, .src[data-i].on { box-shadow: 0 0 0 2px var(--edge); }
 .fail { font-size: 14px; color: var(--muted); border-left: 3px solid var(--wait); padding-left: 10px; }
 .fail.out { border-left-color: var(--out); }
 .fail.skip { border-left-color: var(--skip); }
@@ -210,28 +202,27 @@ td .pill { display: inline-block; }
 .blind ul { margin: 0; padding-left: 18px; }
 .blind li { margin: 6px 0; }
 
+/* Relancer : une carte par situation, avec les réglages à recopier */
+.scen { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: 14px; }
+.scen article {
+  background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--k-pa); border-radius: 8px;
+  padding: 14px 16px; display: grid; gap: 10px; align-content: start; min-width: 0;
+}
+.scen .case { color: var(--muted); font-size: 15px; }
+.scen dl { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); border: 1px solid var(--line); border-radius: 6px; font-size: 14px; }
+.scen dt, .scen dd { margin: 0; padding: 5px 10px; border-top: 1px solid var(--line); }
+.scen dt:first-of-type, .scen dt:first-of-type + dd { border-top: 0; }
+.scen dt { color: var(--muted); background: var(--bg); }
+.val { display: inline-block; font: 600 12px/1.6 var(--f-body); border-radius: 4px; padding: 0 6px; }
+.val.on { background: var(--z-sp); color: var(--k-sp); }
+.val.off { background: var(--skip-bg); color: var(--skip); }
+.val.alt { background: var(--wait-bg); color: var(--wait); }
+.scen .res { font-size: 14px; border-left: 3px solid var(--brand); padding-left: 10px; }
+.scen .res b { color: var(--brand); }
+a { color: var(--brand); }
+
 footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
 
-/* Panneau de fiche */
-#info {
-  position: fixed; top: 0; right: 0; bottom: 0; width: min(360px, 100vw); z-index: 10;
-  background: var(--surface); color: var(--fg); border-left: 1px solid var(--line); box-shadow: -8px 0 24px rgb(0 0 0 / .1);
-  padding: calc(20px + env(safe-area-inset-top, 0px)) 22px calc(20px + env(safe-area-inset-bottom, 0px));
-  overflow-y: auto; display: grid; gap: 14px; align-content: start;
-  transform: translateX(105%); visibility: hidden; transition: transform .18s ease-out, visibility .18s;
-}
-#info.open { transform: none; visibility: visible; }
-@media (max-width: 700px) {
-  #info { top: auto; left: 0; width: auto; max-height: 62vh; border-left: 0; border-top: 1px solid var(--line); border-radius: 14px 14px 0 0; transform: translateY(105%); }
-}
-@media (prefers-reduced-motion: reduce) { #info { transition: none; } }
-#info .sys { justify-self: start; }
-#info h3 { font-size: 22px; padding-right: 36px; }
-#info dl { margin: 0; display: grid; gap: 12px; }
-#info dt { font: 600 12px/1.2 var(--f-display); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-#info dd { margin: 3px 0 0; font-size: 15px; }
-#info .x { position: absolute; top: calc(14px + env(safe-area-inset-top, 0px)); right: 14px; width: 32px; height: 32px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); font-size: 18px; line-height: 1; cursor: pointer; }
-#info .x:focus-visible { outline: 2px solid var(--brand); }
 </style>
 </head>
 <body>
@@ -246,6 +237,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
 <div class="tabs" role="tablist" aria-label="Sections">
   <button role="tab" id="tab-flux" aria-controls="flux" aria-selected="true">Le flux</button>
   <button role="tab" id="tab-exercice" aria-controls="exercice" aria-selected="false">Mode opératoire</button>
+  <button role="tab" id="tab-relance" aria-controls="relance" aria-selected="false">Relancer</button>
   <button role="tab" id="tab-transco" aria-controls="transco" aria-selected="false">La transcodification</button>
   <button role="tab" id="tab-erreurs" aria-controls="erreurs" aria-selected="false">Les erreurs</button>
 </div>
@@ -293,78 +285,78 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
   <div class="node n-bc" style="left:40px;top:72px;width:220px">
     <h4>Données comptables</h4>
     <ul>
-      <li><span data-i="gl" tabindex="0">Écritures du grand livre</span></li>
-      <li><span data-i="plan-local" tabindex="0">Plan comptable local, avec son compte Operis</span></li>
-      <li><span data-i="factures" tabindex="0">Factures d'achat et fournisseurs</span></li>
-      <li><span data-i="parametres" tabindex="0">Devise locale de chaque société</span></li>
+      <li>Écritures du grand livre</li>
+      <li>Plan comptable local, avec son compte Operis</li>
+      <li>Factures d'achat et fournisseurs</li>
+      <li>Devise locale de chaque société</li>
     </ul>
   </div>
   <div class="node n-sp" style="left:40px;top:402px;width:220px">
     <h4>Référentiels Finance</h4>
     <ul>
-      <li><span data-i="entites" tabindex="0">Entités et périmètre</span></li>
-      <li><span data-i="entites-groupe" tabindex="0">Entités groupe</span></li>
-      <li><span data-i="plan-operis" tabindex="0">Plan comptable Operis</span></li>
-      <li><span data-i="cles" tabindex="0">Clés de lettrage</span></li>
-      <li><span data-i="activites" tabindex="0">Activités par pays</span></li>
-      <li><span data-i="devises" tabindex="0">Devises</span></li>
-      <li><span data-i="ajustements" tabindex="0">Ajustements</span></li>
-      <li><span data-i="balance-n1" tabindex="0">Balance Operis N‑1</span></li>
+      <li>Entités et périmètre</li>
+      <li>Entités groupe</li>
+      <li>Plan comptable Operis</li>
+      <li>Clés de lettrage</li>
+      <li>Activités par pays</li>
+      <li>Devises</li>
+      <li>Ajustements</li>
+      <li>Balance Operis N‑1</li>
     </ul>
   </div>
 
   <div class="node n-dk" style="left:350px;top:72px;width:480px">
-    <div class="step" data-i="collecte" tabindex="0">1 · Collecte</div>
+    <div class="step">1 · Collecte</div>
     <p>Extraction Business Central société par société. Seules les écritures nouvelles ou modifiées repartent. Lecture des listes et de la balance N‑1 sur SharePoint.</p>
   </div>
   <div class="node n-dk" style="left:350px;top:198px;width:480px">
-    <div class="step" data-i="controle" tabindex="0">2 · Contrôle des référentiels</div>
+    <div class="step">2 · Contrôle des référentiels</div>
     <p>Colonnes manquantes, doublons, entités sans société, taux illisibles.</p>
   </div>
   <div class="node n-dk" style="left:350px;top:314px;width:480px">
-    <div class="step" data-i="transcodification" tabindex="0">3 · Transcodification</div>
+    <div class="step">3 · Transcodification</div>
     <p>Chaque écriture reçoit un compte Operis, un partenaire, une activité et un montant en EUR. Balance N = N‑1 + variation. Détail dans l'onglet La transcodification.</p>
   </div>
   <div class="node n-dk" style="left:350px;top:470px;width:480px">
-    <div class="step" data-i="publication" tabindex="0">4 · Contrôle et publication</div>
+    <div class="step">4 · Contrôle et publication</div>
     <p>Les totaux doivent être égaux avant et après regroupement. Si un contrôle échoue, les tables gardent le résultat du run précédent.</p>
     <div class="chips">
-      <span data-i="balance" tabindex="0">Balance transcodée</span>
-      <span data-i="import" tabindex="0">Fichier d'import Operis</span>
-      <span data-i="contributions" tabindex="0">Contributions</span>
-      <span data-i="sante" tabindex="0">Santé des données</span>
-      <span data-i="runs" tabindex="0">Historique des runs</span>
+      <span>Balance transcodée</span>
+      <span>Fichier d'import Operis</span>
+      <span>Contributions</span>
+      <span>Santé des données</span>
+      <span>Historique des runs</span>
     </div>
   </div>
 
   <div class="node n-pa" style="left:920px;top:72px;width:240px">
-    <h4><span data-i="fincenter" tabindex="0">Demande de relance</span></h4>
-    <p>On choisit la période et les entités, et on coche la relecture SharePoint si besoin. Power Automate envoie la demande à Dataiku.</p>
+    <h4>Demande de relance</h4>
+    <p>On choisit la période, les entités et ce qu'il faut relire. Power Automate envoie la demande à Dataiku. L'onglet Relancer dit quoi choisir.</p>
   </div>
 
   <div class="node n-bi" style="left:920px;top:302px;width:240px">
-    <h4><span data-i="rapport" tabindex="0">Rapport Transcoding comptable</span></h4>
+    <h4>Rapport Transcoding comptable</h4>
     <ul>
       <li>Vue d'ensemble</li>
-      <li><span data-i="import" tabindex="0">Import Operis</span></li>
+      <li>Import Operis</li>
       <li>Plan comptable général</li>
-      <li><span data-i="contributions" tabindex="0">Contributions</span></li>
+      <li>Contributions</li>
       <li>Contrôle et change</li>
-      <li><span data-i="runs" tabindex="0">Runs</span></li>
-      <li><span data-i="sante" tabindex="0">Santé des données</span></li>
+      <li>Runs</li>
+      <li>Santé des données</li>
     </ul>
   </div>
 </div>
 </div>
-<div class="hint">Survolez un élément souligné pour afficher sa fiche.<span class="narrow"> Le schéma défile horizontalement.</span></div>
+<div class="hint narrow">Le schéma défile horizontalement.</div>
 </div>
 
 <div class="table-scroll">
 <table>
   <thead><tr><th>Où</th><th>Ce qu'on y trouve</th><th>Qui modifie</th></tr></thead>
   <tbody>
-    <tr><td>Business Central</td><td>Écritures, plan comptable local et son champ <code data-i="no2" tabindex="0">No_2</code> (compte Operis), factures, paramètres comptables</td><td>Comptables des sociétés</td></tr>
-    <tr><td>SharePoint mo-finance</td><td>Référentiels Finance et balance N‑1, déposée dans <code data-i="balance-n1" tabindex="0">operis/balance/</code></td><td>Finance</td></tr>
+    <tr><td>Business Central</td><td>Écritures, plan comptable local et son champ <code>No_2</code> (compte Operis), factures, paramètres comptables</td><td>Comptables des sociétés</td></tr>
+    <tr><td>SharePoint mo-finance</td><td>Référentiels Finance et balance N‑1, déposée dans <code>operis/balance/</code></td><td>Finance</td></tr>
     <tr><td>Dataiku + BigQuery</td><td>Copies des sources, calcul, tables publiées, historique des runs sur 24 mois</td><td>Personne à la main. Le traitement écrit seul.</td></tr>
     <tr><td>FinCenter Lite</td><td>Demandes de relance</td><td>Finance</td></tr>
     <tr><td>Power BI</td><td>Lecture des tables publiées dans BigQuery</td><td>Lecture seule</td></tr>
@@ -381,7 +373,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
   <li><div class="step-body">
     <span class="when">Une fois par an</span>
     <h3>Déposer la balance Operis N‑1</h3>
-    <p>Exporter depuis Operis la balance de clôture de l'exercice précédent, par entité, compte et partenaire. La déposer telle quelle dans le dossier <span class="src sp" data-i="balance-n1" tabindex="0">SharePoint · operis/balance/</span>.</p>
+    <p>Exporter depuis Operis la balance de clôture de l'exercice précédent, par entité, compte et partenaire. La déposer telle quelle dans le dossier <span class="src sp">SharePoint · operis/balance/</span>.</p>
     <ul>
       <li>Ranger l'ancienne balance dans le sous-dossier <code>bkp/</code>. Il n'est pas lu.</li>
       <li>On peut déposer plusieurs fichiers au même format, à condition qu'ils ne se recoupent pas.</li>
@@ -394,7 +386,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
   <li><div class="step-body">
     <span class="when">Une fois par an</span>
     <h3>Choisir les entités à traiter</h3>
-    <p>Dans la liste <span class="src sp" data-i="entites" tabindex="0">SharePoint · Entités</span>, cocher <b>IncludeInTransco</b> pour chaque entité du périmètre.</p>
+    <p>Dans la liste <span class="src sp">SharePoint · Entités</span>, cocher <b>IncludeInTransco</b> pour chaque entité du périmètre.</p>
     <ul>
       <li>Renseigner <b>BusinessCentralEnvironment</b> et <b>BusinessCentralBase</b>. Ils désignent la société Business Central de l'entité.</li>
       <li>Renseigner le <b>Code partenaire</b> si l'entité mouvemente le compte 181500.</li>
@@ -406,11 +398,11 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
   <li><div class="step-body">
     <span class="when need">Nouvelle entité ou nouveau compte</span>
     <h3>Compléter les règles de traitement</h3>
-    <p><b>Nouveau compte Operis.</b> L'ajouter dans <span class="src sp" data-i="plan-operis" tabindex="0">SharePoint · Comptes comptables Opéris</span> avec sa rubrique analytique, son flux, son type d'activité, son type d'analyse et la case « Peut avoir des partenaires ? ».</p>
+    <p><b>Nouveau compte Operis.</b> L'ajouter dans <span class="src sp">SharePoint · Comptes comptables Opéris</span> avec sa rubrique analytique, son flux, son type d'activité, son type d'analyse et la case « Peut avoir des partenaires ? ».</p>
     <p><b>Nouvelle entité.</b></p>
     <ul>
-      <li>Vérifier dans <span class="src bc" data-i="plan-local" tabindex="0">BC · Plan comptable</span> que chaque compte local porte son compte Operis dans la colonne <code data-i="no2" tabindex="0">No_2</code>.</li>
-      <li>Ajouter ses lignes dans <span class="src sp" data-i="cles" tabindex="0">SharePoint · Clés de lettrage</span> et <span class="src sp" data-i="activites" tabindex="0">SharePoint · Activités spécifiques de pays</span>.</li>
+      <li>Vérifier dans <span class="src bc">BC · Plan comptable</span> que chaque compte local porte son compte Operis dans la colonne <code>No_2</code>.</li>
+      <li>Ajouter ses lignes dans <span class="src sp">SharePoint · Clés de lettrage</span> et <span class="src sp">SharePoint · Activités spécifiques de pays</span>.</li>
     </ul>
     <p class="fail">Dans Clés de lettrage, saisir le code entité et le compte dans les colonnes texte <b>EntityCode</b> et <b>OperisAccount</b>. Les colonnes de recherche Entité et Compte Operis ne sont pas lues.</p>
     <label class="check"><input type="checkbox" id="todo-3"> Fait</label>
@@ -419,7 +411,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
   <li><div class="step-body">
     <span class="when month">À chaque clôture</span>
     <h3>Mettre à jour les taux de change</h3>
-    <p>Ajouter les taux du mois dans <span class="src sp" data-i="devises" tabindex="0">SharePoint · Devises</span>, une ligne par devise vers l'EUR. Inutile d'effacer les anciennes lignes. Le run prend le taux le plus récent de chaque devise.</p>
+    <p>Ajouter les taux du mois dans <span class="src sp">SharePoint · Devises</span>, une ligne par devise vers l'EUR. Inutile d'effacer les anciennes lignes. Le run prend le taux le plus récent de chaque devise.</p>
     <p class="fail out">Deux valeurs différentes pour la même devise à la même date : la devise n'a plus de taux, et toutes les sociétés qui l'utilisent sortent de l'import.</p>
     <label class="check"><input type="checkbox" id="todo-4"> Fait</label>
   </div></li>
@@ -427,15 +419,15 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
   <li><div class="step-body">
     <span class="when month">À chaque clôture</span>
     <h3>Lancer la transco</h3>
-    <p>Dans <span class="src pa" data-i="fincenter" tabindex="0">FinCenter Lite</span>, choisir la période de clôture et les entités. Cocher la relecture SharePoint dès qu'une liste ou la balance N‑1 a changé. Au premier mois d'un exercice, c'est toujours le cas.</p>
-    <p>Le premier run d'une période recalcule toutes les entités, même si on n'en a choisi qu'une. Le résultat s'affiche dans la page <span class="src bi" data-i="runs" tabindex="0">Power BI · Runs</span>.</p>
+    <p>Dans <span class="src pa">FinCenter Lite</span>, choisir la période de clôture, ne sélectionner aucune entité, laisser le grand livre coché en incrémental et cocher les référentiels SharePoint. Les taux du mois viennent d'être saisis, il faut donc toujours relire SharePoint à ce premier run.</p>
+    <p>Ce run recalcule toutes les entités. Le résultat s'affiche dans la page <span class="src bi">Power BI · Runs</span>. Pour les relances suivantes, voir l'onglet <a href="#relance">Relancer</a>.</p>
     <label class="check"><input type="checkbox" id="todo-5"> Fait</label>
   </div></li>
 
   <li><div class="step-body">
     <span class="when month">À chaque clôture</span>
     <h3>Corriger jusqu'à zéro anomalie</h3>
-    <p>Ouvrir <span class="src bi" data-i="sante" tabindex="0">Power BI · Santé des données</span>. Chaque ligne dit ce qui manque et où le corriger. Corriger dans Business Central ou SharePoint, puis relancer sur les entités concernées. Le détail des cas est dans l'onglet Les erreurs.</p>
+    <p>Ouvrir <span class="src bi">Power BI · Santé des données</span>. Chaque ligne dit ce qui manque et où le corriger. Corriger dans Business Central ou SharePoint, puis relancer sur les entités concernées. Le détail des cas est dans l'onglet Les erreurs.</p>
     <p>Vérifier aussi les taux appliqués dans la page Contrôle et change.</p>
     <label class="check"><input type="checkbox" id="todo-6"> Fait</label>
   </div></li>
@@ -443,7 +435,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
   <li><div class="step-body">
     <span class="when need">Si besoin</span>
     <h3>Ajouter les ajustements manuels</h3>
-    <p>Un écart qui ne se corrige pas à la source va dans <span class="src sp" data-i="ajustements" tabindex="0">SharePoint · Ajustements d'intégration de balance</span>, avec l'entité, le compte Operis, le partenaire, la date d'intégration et le montant en EUR. Le run les traite comme le reste et les place dans l'import.</p>
+    <p>Un écart qui ne se corrige pas à la source va dans <span class="src sp">SharePoint · Ajustements d'intégration de balance</span>, avec l'entité, le compte Operis, le partenaire, la date d'intégration et le montant en EUR. Le run les traite comme le reste et les place dans l'import.</p>
     <p>Mieux vaut tout y inscrire. La liste sert de registre, et c'est elle qu'on relit quand un montant surprend.</p>
     <p class="fail">Seuls les ajustements datés du 1er janvier au dernier jour de la période comptent. Comme pour les clés de lettrage, saisir <b>EntityCode</b> et <b>OperisAccount</b> en texte. Relancer avec la relecture SharePoint cochée.</p>
     <label class="check"><input type="checkbox" id="todo-7"> Fait</label>
@@ -452,41 +444,156 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
   <li><div class="step-body">
     <span class="when month">À chaque clôture</span>
     <h3>Récupérer l'import</h3>
-    <p>La page <span class="src bi" data-i="import" tabindex="0">Power BI · Import Operis</span> contient les lignes à charger dans Operis, au format à 42 colonnes. La page Contributions montre d'où vient chaque montant.</p>
+    <p>La page <span class="src bi">Power BI · Import Operis</span> contient les lignes à charger dans Operis, au format à 42 colonnes. La page Contributions montre d'où vient chaque montant.</p>
     <label class="check"><input type="checkbox" id="todo-8"> Fait</label>
   </div></li>
 </ol>
 <button class="reset" id="todo-reset" type="button">Tout décocher</button>
 </section>
 
-<!-- ============ Onglet 3 : la transcodification ============ -->
+<!-- ============ Onglet 3 : relancer ============ -->
+<section class="panel" id="relance" role="tabpanel" aria-labelledby="tab-relance">
+<p class="lead">L'écran de relance de FinCenter Lite a cinq réglages. Trouvez ci-dessous la situation qui ressemble à la vôtre et recopiez ses réglages. Dans le doute, cochez les référentiels SharePoint. Le run sera plus long, mais son résultat sera juste.</p>
+
+<div class="scen">
+  <article>
+    <h3>La clôture commence</h3>
+    <p class="case">Les taux du mois sont saisis dans Devises. Au premier mois d'un exercice, la balance N‑1 est déposée. C'est le premier run de la période.</p>
+    <dl>
+      <dt>Période</dt><dd>Le mois clôturé</dd>
+      <dt>Entités</dt><dd>Aucune, donc toutes</dd>
+      <dt>Grand livre</dt><dd><span class="val on">Coché</span></dd>
+      <dt>Mode</dt><dd>Incrémental</dd>
+      <dt>Référentiels</dt><dd><span class="val on">Coché</span></dd>
+    </dl>
+    <p class="res"><b>Toutes les entités</b> sont recalculées.</p>
+  </article>
+
+  <article>
+    <h3>J'ai corrigé dans Business Central</h3>
+    <p class="case">Un <code>No_2</code> manquant, une écriture, une devise locale. Rien n'a changé dans SharePoint depuis le dernier run.</p>
+    <dl>
+      <dt>Période</dt><dd>La même que le dernier run</dd>
+      <dt>Entités</dt><dd>Celles que vous avez corrigées</dd>
+      <dt>Grand livre</dt><dd><span class="val on">Coché</span></dd>
+      <dt>Mode</dt><dd>Incrémental</dd>
+      <dt>Référentiels</dt><dd><span class="val off">Décoché</span></dd>
+    </dl>
+    <p class="res"><b>Seules ces entités</b> sont recalculées, en quelques minutes. Les autres gardent leur résultat à l'identique.</p>
+  </article>
+
+  <article>
+    <h3>J'ai corrigé une liste SharePoint</h3>
+    <p class="case">Un taux, un compte Operis, une clé de lettrage, une activité, un ajustement, une entité, ou la balance N‑1. Rien n'a changé dans Business Central.</p>
+    <dl>
+      <dt>Période</dt><dd>La même que le dernier run</dd>
+      <dt>Entités</dt><dd>Peu importe</dd>
+      <dt>Grand livre</dt><dd><span class="val off">Décoché</span></dd>
+      <dt>Mode</dt><dd>Sans effet</dd>
+      <dt>Référentiels</dt><dd><span class="val on">Coché</span></dd>
+    </dl>
+    <p class="res"><b>Toutes les entités</b> sont recalculées. Une liste sert à plusieurs entités, on ne peut pas en recalculer une seule.</p>
+  </article>
+
+  <article>
+    <h3>J'ai corrigé des deux côtés</h3>
+    <p class="case">Une correction dans Business Central et une autre dans une liste SharePoint.</p>
+    <dl>
+      <dt>Période</dt><dd>La même que le dernier run</dd>
+      <dt>Entités</dt><dd>Celles corrigées dans Business Central</dd>
+      <dt>Grand livre</dt><dd><span class="val on">Coché</span></dd>
+      <dt>Mode</dt><dd>Incrémental</dd>
+      <dt>Référentiels</dt><dd><span class="val on">Coché</span></dd>
+    </dl>
+    <p class="res"><b>Toutes les entités</b> sont recalculées. Le grand livre n'est relu que pour les entités choisies.</p>
+  </article>
+
+  <article>
+    <h3>Une entité ne colle pas à Business Central</h3>
+    <p class="case">Le solde d'une entité diffère de Business Central alors que Santé des données ne signale rien. Une écriture a peut-être disparu de Business Central. L'incrémental ne voit que les ajouts et les modifications, pas les disparitions.</p>
+    <dl>
+      <dt>Période</dt><dd>La même que le dernier run</dd>
+      <dt>Entités</dt><dd>Une seule</dd>
+      <dt>Grand livre</dt><dd><span class="val on">Coché</span></dd>
+      <dt>Mode</dt><dd><span class="val alt">Réconciliation</span></dd>
+      <dt>Référentiels</dt><dd><span class="val off">Décoché</span></dd>
+    </dl>
+    <p class="res"><b>Cette entité</b> est recalculée après une relecture complète de son grand livre. Plus long qu'un incrémental.</p>
+  </article>
+
+  <article>
+    <h3>Je veux recalculer un autre mois</h3>
+    <p class="case">Revoir une période déjà clôturée, ou passer au mois suivant.</p>
+    <dl>
+      <dt>Période</dt><dd>Le mois voulu</dd>
+      <dt>Entités</dt><dd>Aucune, donc toutes</dd>
+      <dt>Grand livre</dt><dd><span class="val on">Coché</span></dd>
+      <dt>Mode</dt><dd>Incrémental</dd>
+      <dt>Référentiels</dt><dd><span class="val on">Coché</span></dd>
+    </dl>
+    <p class="res"><b>Toutes les entités</b> sont recalculées. Le rapport affiche ensuite ce mois. Relancez la période en cours pour y revenir.</p>
+  </article>
+</div>
+
+<div>
+<h2 style="margin-bottom:12px">Les réglages un par un</h2>
+<div class="table-scroll">
+<table>
+  <thead><tr><th>Réglage</th><th>Ce qu'il fait</th><th>À savoir</th></tr></thead>
+  <tbody>
+    <tr><td>Période</td><td>Le mois de clôture à calculer. Les écritures et les ajustements comptent jusqu'à son dernier jour.</td><td>Une période différente de celle du dernier run recalcule toutes les entités, et le rapport bascule sur ce mois.</td></tr>
+    <tr><td>Entités</td><td>Les entités dont on relit le grand livre. Si le run est partiel, ce sont aussi les seules recalculées.</td><td>Sans sélection, l'écran envoie toutes les entités cochées <b>IncludeInTransco</b>. Une entité inconnue ou décochée fait refuser la demande.</td></tr>
+    <tr><td>Grand livre</td><td>Relit dans Business Central les écritures des entités choisies, puis le plan comptable et la devise locale de toutes les sociétés.</td><td>Décoché, le run part de la dernière copie, rafraîchie chaque jour. Utile seulement quand rien n'a bougé dans Business Central.</td></tr>
+    <tr><td>Mode</td><td><b>Incrémental</b> relit les écritures nouvelles ou modifiées depuis la dernière lecture. <b>Réconciliation</b> relit tout le grand livre de l'entité et remplace la copie.</td><td>La réconciliation n'accepte qu'une entité. Le mode ne joue que si le grand livre est coché.</td></tr>
+    <tr><td>Référentiels</td><td>Relit les listes <span class="src sp">SharePoint</span> et la balance N‑1 dans <code>operis/balance/</code>.</td><td>Décoché, le run utilise les listes telles qu'il les a lues la dernière fois. Une saisie récente n'est donc pas vue. Coché, toutes les entités sont recalculées.</td></tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+<div class="blind">
+  <h2>Partiel ou complet</h2>
+  <p>Le run ne recalcule que les entités choisies quand deux conditions sont réunies. Les référentiels ne sont pas relus, et la période est celle du dernier run publié. Sinon il recalcule toutes les entités, quelle que soit la sélection.</p>
+  <p>Ce choix est automatique, on ne peut pas le forcer. La page Runs affiche la portée de chaque run, complète ou partielle, avec ses entités.</p>
+</div>
+
+<div class="blind">
+  <h2>Ce que la relance ne relit pas</h2>
+  <ul>
+    <li><b>Factures d'achat et fournisseurs.</b> Ils sont relus toutes les heures, à la demie. Après une correction de facture ou de fournisseur, attendre la demie suivante avant de relancer.</li>
+    <li><b>Nouvelle société Business Central.</b> La liste des sociétés est relue le dimanche et le lundi à 6 h. Une société créée en semaine n'est pas visible avant.</li>
+  </ul>
+</div>
+</section>
+
+<!-- ============ Onglet 4 : la transcodification ============ -->
 <section class="panel" id="transco" role="tabpanel" aria-labelledby="tab-transco">
 <p class="lead">Le calcul part des écritures Business Central et arrive à une ligne d'import par entité, compte Operis et partenaire. Les étapes s'enchaînent dans cet ordre. Pour chacune, on indique la source consultée et ce qui arrive si elle ne répond pas.</p>
 
 <ol class="steps">
   <li><div class="step-body">
     <h3>Retenir les écritures de la période</h3>
-    <p>On garde les entités cochées <b>IncludeInTransco</b> dans la liste <span class="src sp" data-i="entites" tabindex="0">SharePoint · Entités</span>. Chaque entité pointe vers une seule société Business Central.</p>
-    <p>Pour chacune, on prend toutes les écritures <span class="src bc" data-i="gl" tabindex="0">BC · Grand livre</span> dont la date comptable tombe au plus tard le dernier jour de la période. Ce dernier jour est inclus. Une écriture d'abonnement passée le 31 et extournée le 1er reste donc dans le mois.</p>
+    <p>On garde les entités cochées <b>IncludeInTransco</b> dans la liste <span class="src sp">SharePoint · Entités</span>. Chaque entité pointe vers une seule société Business Central.</p>
+    <p>Pour chacune, on prend toutes les écritures <span class="src bc">BC · Grand livre</span> dont la date comptable tombe au plus tard le dernier jour de la période. Ce dernier jour est inclus. Une écriture d'abonnement passée le 31 et extournée le 1er reste donc dans le mois.</p>
     <p>Le ledger vaut EXTRA de janvier à novembre, SOCIAL en décembre.</p>
   </div></li>
 
   <li><div class="step-body">
     <h3>Convertir en EUR</h3>
-    <p>La devise de la société vient de <span class="src bc" data-i="parametres" tabindex="0">BC · Paramètres comptabilité</span>. Le taux est le dernier publié dans <span class="src sp" data-i="devises" tabindex="0">SharePoint · Devises</span> au moment du run. Le taux, sa date et sa source restent visibles ligne par ligne.</p>
+    <p>La devise de la société vient de <span class="src bc">BC · Paramètres comptabilité</span>. Le taux est le dernier publié dans <span class="src sp">SharePoint · Devises</span> au moment du run. Le taux, sa date et sa source restent visibles ligne par ligne.</p>
     <p>On convertit avant de chercher le compte. Une écriture sans compte Operis garde ainsi un montant EUR, qu'on peut mettre en attente.</p>
     <p class="fail out">Pas de taux utilisable pour la devise : toute la société sort de l'import, balance N‑1 et ajustements compris. Garder seulement ces derniers annulerait à tort sa position Operis.</p>
   </div></li>
 
   <li><div class="step-body">
     <h3>Trouver le compte Operis</h3>
-    <p>Le compte local porte son compte Operis dans le champ <code data-i="no2" tabindex="0">No_2</code> du <span class="src bc" data-i="plan-local" tabindex="0">BC · Plan comptable</span>. Ce compte doit exister dans <span class="src sp" data-i="plan-operis" tabindex="0">SharePoint · Comptes comptables Opéris</span>, qui fournit le reste :</p>
+    <p>Le compte local porte son compte Operis dans le champ <code>No_2</code> du <span class="src bc">BC · Plan comptable</span>. Ce compte doit exister dans <span class="src sp">SharePoint · Comptes comptables Opéris</span>, qui fournit le reste :</p>
     <ul>
       <li>le flux et la rubrique analytique ;</li>
       <li>le type d'analyse et le type d'activité ;</li>
       <li>la case <b>Peut avoir des partenaires ?</b></li>
     </ul>
-    <p class="fail">Compte local sans <code>No_2</code>, ou <code>No_2</code> absent du plan Operis : le montant part sur le <span data-i="attente" tabindex="0">compte d'attente 471000</span>.</p>
+    <p class="fail">Compte local sans <code>No_2</code>, ou <code>No_2</code> absent du plan Operis : le montant part sur le compte d'attente 471000.</p>
   </div></li>
 
   <li><div class="step-body">
@@ -497,8 +604,8 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
       <thead><tr><th>Règle</th><th>Quand</th><th>Partenaire retenu</th></tr></thead>
       <tbody>
         <tr><td>Sans partenaire</td><td>Case « Peut avoir des partenaires ? » décochée</td><td>Aucun</td></tr>
-        <tr><td>Fournisseur groupe</td><td>Case cochée</td><td>On part du numéro de document de l'écriture. On trouve la <span data-i="factures" tabindex="0">facture d'achat</span>, puis son fournisseur. Si ce fournisseur figure dans <span class="src sp" data-i="entites-groupe" tabindex="0">Entités groupe</span>, son numéro devient le partenaire. Sinon, pas de partenaire.</td></tr>
-        <tr><td>Partenaire de l'entité</td><td>Compte 181500</td><td>Le code partenaire saisi sur l'entité dans <span class="src sp" data-i="entites" tabindex="0">Entités</span></td></tr>
+        <tr><td>Fournisseur groupe</td><td>Case cochée</td><td>On part du numéro de document de l'écriture. On trouve la facture d'achat, puis son fournisseur. Si ce fournisseur figure dans <span class="src sp">Entités groupe</span>, son numéro devient le partenaire. Sinon, pas de partenaire.</td></tr>
+        <tr><td>Partenaire de l'entité</td><td>Compte 181500</td><td>Le code partenaire saisi sur l'entité dans <span class="src sp">Entités</span></td></tr>
       </tbody>
     </table>
     </div>
@@ -507,8 +614,8 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
 
   <li><div class="step-body">
     <h3>Compléter l'activité et la clé de pointage</h3>
-    <p>L'activité cible vient de <span class="src sp" data-i="activites" tabindex="0">SharePoint · Activités spécifiques de pays</span>, selon l'entité et le type d'activité du compte Operis. La dimension ACTIVITE de Business Central n'est pas lue.</p>
-    <p>La clé de pointage vient de <span class="src sp" data-i="cles" tabindex="0">SharePoint · Clés de lettrage</span>, selon l'entité et le compte Operis.</p>
+    <p>L'activité cible vient de <span class="src sp">SharePoint · Activités spécifiques de pays</span>, selon l'entité et le type d'activité du compte Operis. La dimension ACTIVITE de Business Central n'est pas lue.</p>
+    <p>La clé de pointage vient de <span class="src sp">SharePoint · Clés de lettrage</span>, selon l'entité et le compte Operis.</p>
     <p class="fail skip">Règle saisie deux fois avec des valeurs différentes : aucune n'est retenue, et la colonne reste vide dans l'import.</p>
   </div></li>
 
@@ -517,8 +624,8 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
     <p>On regroupe par entité, compte Operis et partenaire. Pour chaque ligne :</p>
     <div class="formula">Variation = balance BC en EUR − balance Operis N‑1 + ajustements</div>
     <ul>
-      <li>La balance N‑1 est le fichier déposé dans <span class="src sp" data-i="balance-n1" tabindex="0">operis/balance/</span>, en EUR.</li>
-      <li>Les ajustements sont ceux de la liste <span class="src sp" data-i="ajustements" tabindex="0">Ajustements</span> datés du 1er janvier au dernier jour de la période.</li>
+      <li>La balance N‑1 est le fichier déposé dans <span class="src sp">operis/balance/</span>, en EUR.</li>
+      <li>Les ajustements sont ceux de la liste <span class="src sp">Ajustements</span> datés du 1er janvier au dernier jour de la période.</li>
       <li>Une ligne présente en N‑1 mais plus dans Business Central donne une variation qui la ramène à zéro.</li>
     </ul>
     <p>Le calcul travaille en décimaux exacts. On n'arrondit qu'à la fin, à deux décimales.</p>
@@ -545,14 +652,14 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
       </tbody>
     </table>
     </div>
-    <p>Les 31 autres colonnes restent vides. La page <span data-i="contributions" tabindex="0">Contributions</span> du rapport montre, pour chaque ligne, les écritures, lignes N‑1 et ajustements qui la composent.</p>
+    <p>Les 31 autres colonnes restent vides. La page Contributions du rapport montre, pour chaque ligne, les écritures, lignes N‑1 et ajustements qui la composent.</p>
   </div></li>
 </ol>
 </section>
 
-<!-- ============ Onglet 4 : les erreurs ============ -->
+<!-- ============ Onglet 5 : les erreurs ============ -->
 <section class="panel" id="erreurs" role="tabpanel" aria-labelledby="tab-erreurs">
-<p class="lead">Une donnée manquante ou contradictoire n'arrête pas le run, sauf dans les cas de la première colonne. Le run publie, met la ligne de côté et dit où corriger. Tout ce qui est mis de côté apparaît dans la page <span data-i="sante" tabindex="0">Santé des données</span>. L'objectif est zéro ligne.</p>
+<p class="lead">Une donnée manquante ou contradictoire n'arrête pas le run, sauf dans les cas de la première colonne. Le run publie, met la ligne de côté et dit où corriger. Tout ce qui est mis de côté apparaît dans la page Santé des données. L'objectif est zéro ligne.</p>
 
 <div class="treat">
   <article>
@@ -565,11 +672,11 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
       <li>Extraction du grand livre incomplète</li>
       <li>Totaux qui ne tombent pas juste</li>
     </ul>
-    <p class="where">Page <span data-i="runs" tabindex="0">Runs</span>, statut FAILED, avec le motif.</p>
+    <p class="where">Page Runs, statut FAILED, avec le motif.</p>
   </article>
   <article>
     <span class="pill wait">Compte d'attente</span>
-    <p>Le montant EUR va sur le <span data-i="attente" tabindex="0">471000</span>, sans partenaire. L'import reste complet en montant.</p>
+    <p>Le montant EUR va sur le 471000, sans partenaire. L'import reste complet en montant.</p>
     <ul>
       <li>Compte local sans <code>No_2</code></li>
       <li><code>No_2</code> absent du plan Operis</li>
@@ -638,7 +745,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
 
 <div class="blind">
   <h2>Après correction</h2>
-  <p>Dans FinCenter Lite, choisir la période et les entités corrigées. Si la correction porte sur une liste SharePoint, cocher la relecture des référentiels. Le run recalcule alors toutes les entités. Une correction dans Business Central seule ne recalcule que les entités choisies.</p>
+  <p>Relancer depuis FinCenter Lite. Les réglages dépendent de l'endroit où l'on a corrigé. L'onglet <a href="#relance">Relancer</a> les donne situation par situation.</p>
   <p>La ligne disparaît de Santé des données au run suivant.</p>
 </div>
 </section>
@@ -647,145 +754,8 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
 
 </div>
 
-<aside id="info" aria-live="polite" aria-label="Fiche de l'élément">
-  <button class="x" type="button" aria-label="Fermer la fiche">×</button>
-  <span class="src sys" id="info-sys"></span>
-  <h3 id="info-title"></h3>
-  <p id="info-def"></p>
-  <dl id="info-dl"></dl>
-</aside>
-
 <script>
-/* Une fiche par élément : système, titre, définition, puis les rubriques présentes. */
-const INFO = {
-  "gl": { sys: "bc", t: "Écritures du grand livre", d: "Les écritures comptables validées de chaque société Business Central.",
-    grain: "Une écriture.", lu: "Date comptable, compte local, montant en devise locale, numéro de document.",
-    sert: "Base de la balance. Le numéro de document sert à retrouver la facture d'achat, donc le partenaire.",
-    note: "Rafraîchies en incrémental : seules les écritures nouvelles ou modifiées repartent. Une extraction incomplète arrête la transco." },
-  "plan-local": { sys: "bc", t: "Plan comptable local", d: "Les comptes de chaque société, avec leur correspondance Operis.",
-    grain: "Un compte local par société.", lu: "Numéro (No), libellé (Name), compte Operis (No_2).",
-    sert: "Donner à chaque écriture son compte Operis.",
-    note: "Sans No_2, ou avec un No_2 inconnu d'Operis, le montant part sur le compte d'attente." },
-  "no2": { sys: "bc", t: "Champ No_2", d: "Colonne du plan comptable Business Central qui porte le numéro du compte Operis.",
-    sert: "Seul lien entre un compte local et son compte Operis.",
-    note: "À corriger dans Business Central. Le run n'a pas de table de correspondance à part." },
-  "factures": { sys: "bc", t: "Factures d'achat et fournisseurs", d: "Les factures d'achat validées et la fiche fournisseur associée.",
-    grain: "Une facture par société. Un fournisseur par société.", lu: "Numéro de facture, numéro de fournisseur.",
-    sert: "Retrouver le partenaire groupe d'une écriture passée sur un compte avec partenaires.",
-    note: "Deux factures ou deux fournisseurs pour le même numéro : compte d'attente. Seules les écritures issues d'une facture trouvent un partenaire." },
-  "parametres": { sys: "bc", t: "Paramètres comptabilité", d: "Le paramétrage général de chaque société.",
-    grain: "Une ligne par société.", lu: "Devise locale.",
-    sert: "Savoir dans quelle devise sont les écritures, donc quel taux appliquer.",
-    note: "Devise absente ou paramétrage en double : la société sort de l'import." },
-  "entites": { sys: "sp", t: "Entités", d: "La liste qui fixe le périmètre de la transco.",
-    grain: "Une entité Operis.", lu: "Code, IncludeInTransco, BusinessCentralEnvironment, BusinessCentralBase, Code partenaire.",
-    sert: "Choisir les entités traitées et les relier à une société Business Central. Le code partenaire alimente le compte 181500.",
-    note: "Une entité cochée sans société trouvée arrête le run. Un code présent deux fois exclut l'entité." },
-  "entites-groupe": { sys: "sp", t: "Entités groupe", d: "Les établissements qui appartiennent au groupe.",
-    grain: "Un établissement.", lu: "Code établissement.",
-    sert: "Décider si le fournisseur d'une facture est un partenaire groupe. Le préfixe 00 du numéro fournisseur ne compte plus.",
-    note: "Hypothèse à confirmer : le numéro fournisseur Business Central est identique au code établissement." },
-  "plan-operis": { sys: "sp", t: "Comptes comptables Opéris", d: "Le plan comptable général Operis et ses attributs.",
-    grain: "Un compte Operis.", lu: "Compte, Rubrique analytique, Flux, Type d'activité, Type d'analyse, Peut avoir des partenaires ?",
-    sert: "Remplir Product, Chartfield 1 et Analysis dans l'import, choisir la règle de partenaire et l'activité.",
-    note: "Un compte absent envoie les montants sur le compte d'attente. Deux lignes divergentes pour un même compte : les deux sont ignorées." },
-  "cles": { sys: "sp", t: "Clés de lettrage", d: "La clé de pointage à porter pour un compte d'une entité.",
-    grain: "Une entité et un compte Operis.", lu: "EntityCode, OperisAccount, Clé de pointage.",
-    sert: "Remplir Open Item Key dans l'import.",
-    note: "Seules les colonnes texte EntityCode et OperisAccount comptent. Une clé saisie deux fois laisse la colonne vide." },
-  "activites": { sys: "sp", t: "Activités spécifiques de pays", d: "L'activité cible Operis selon l'entité et le type d'activité du compte.",
-    grain: "Une entité et un type d'activité.", lu: "Entité, Type d'activité, Activité cible.",
-    sert: "Remplir Chartfield 3 dans l'import. La dimension ACTIVITE de Business Central n'est pas lue.",
-    note: "Pas de ligne : activité vide. Deux lignes pour le même couple : aucune n'est retenue." },
-  "devises": { sys: "sp", t: "Devises", d: "Les taux de change publiés par la Finance.",
-    grain: "Une devise, une devise cible et une date.", lu: "Currency, TargetCurrency, PositionDate, ConversionRate.",
-    sert: "Convertir en EUR au dernier taux publié de chaque devise, au moment du run.",
-    note: "Deux valeurs à la dernière date, ou un taux nul ou illisible : la devise est inutilisable et ses sociétés sortent de l'import. Les doublons plus anciens ne gênent pas." },
-  "ajustements": { sys: "sp", t: "Ajustements d'intégration de balance", d: "Le registre des corrections manuelles, en EUR.",
-    grain: "Un ajustement.", lu: "EntityCode, OperisAccount, Partenaire, Date d'intégration, Montant (€).",
-    sert: "S'ajouter à la variation de la ligne correspondante. Un ajustement seul crée sa propre ligne d'import.",
-    note: "Comptent ceux datés du 1er janvier au dernier jour de la période. Entité inconnue : exclu. Compte inconnu : compte d'attente." },
-  "balance-n1": { sys: "sp", t: "Balance Operis N‑1", d: "L'export Operis de la balance de clôture de l'exercice précédent.",
-    grain: "Une entité, un compte et un partenaire.", lu: "Entité, Compte, Partenaire, Devise, Solde fin de période net.",
-    sert: "Point de départ. La variation importée est l'écart entre la balance Business Central et cette balance.",
-    note: "Dossier operis/balance/, hors bkp/. Montants en EUR. L'année du fichier n'est pas vérifiée." },
-  "collecte": { sys: "dk", t: "Collecte", d: "Copie des sources dans Dataiku avant tout calcul.",
-    sert: "Travailler sur une photo datée des sources. La transco ne contacte jamais Business Central directement.",
-    note: "Les listes SharePoint ne sont relues que si on coche la relecture dans FinCenter Lite." },
-  "controle": { sys: "dk", t: "Contrôle des référentiels", d: "Les vérifications faites avant le calcul.",
-    sert: "Arrêter le run sur une colonne manquante ou une valeur illisible, écarter les doublons.",
-    note: "Un doublon n'arrête rien. La ligne est ignorée et signalée." },
-  "transcodification": { sys: "dk", t: "Transcodification", d: "Le passage de chaque écriture locale à sa ligne Operis.",
-    sert: "Compte, partenaire, activité, clé de pointage et montant EUR, puis regroupement.",
-    note: "Détail pas à pas dans l'onglet La transcodification." },
-  "publication": { sys: "dk", t: "Contrôle et publication", d: "L'écriture des résultats dans BigQuery.",
-    sert: "Publier toutes les tables d'un coup, après contrôle des totaux.",
-    note: "Si un contrôle échoue, rien n'est écrit. Les tables gardent le run précédent." },
-  "balance": { sys: "dk", t: "Balance transcodée", d: "La balance détaillée du dernier run publié.",
-    grain: "Une entité, un compte Operis et un partenaire.", lu: "Balance BC en devise et en EUR, balance N‑1, ajustements, variation, taux appliqué.",
-    sert: "Audit. Les lignes à variation nulle y restent." },
-  "import": { sys: "bi", t: "Import Operis", d: "Les lignes à charger dans Operis.",
-    grain: "Une ligne par variation non nulle.", lu: "42 colonnes au format du Power Query historique, montant arrondi à deux décimales.",
-    sert: "Chargement dans Operis. Les montants en attente y figurent sur le compte 471000." },
-  "contributions": { sys: "bi", t: "Contributions", d: "Ce qui compose chaque ligne de balance.",
-    grain: "Une écriture, une ligne N‑1 ou un ajustement.",
-    sert: "Répondre à « d'où vient ce montant ? ». Chaque contribution pointe vers sa ligne de balance et son écriture.",
-    note: "Une contribution exclue de l'import n'a pas de ligne de balance." },
-  "sante": { sys: "bi", t: "Santé des données", d: "Les anomalies du dernier run, regroupées par chose à corriger.",
-    grain: "Un motif, une clé à corriger et un traitement.", lu: "Entité, motif, clé, compte local, traitement, où corriger, nombre de lignes, montants.",
-    sert: "Liste de travail. L'objectif est zéro ligne.",
-    note: "Une ligne disparaît au run suivant, une fois la source corrigée." },
-  "runs": { sys: "bi", t: "Runs", d: "L'historique des exécutions.",
-    grain: "Un run.", lu: "Période, statut, portée complète ou partielle, entités, compteurs, taux utilisés.",
-    sert: "Savoir si le dernier run a abouti, et sinon pourquoi.",
-    note: "SUCCEEDED : publié. SUCCEEDED_WITH_REJECTIONS : publié avec des anomalies. FAILED : rien publié. Conservé 24 mois." },
-  "fincenter": { sys: "pa", t: "FinCenter Lite", d: "L'application Power Apps qui lance une relance.",
-    lu: "Période de clôture, entités, relecture SharePoint oui ou non.",
-    sert: "Rafraîchir le grand livre des entités choisies, relire SharePoint si demandé, puis recalculer la transco.",
-    note: "Avec la relecture cochée, ou au premier run d'une période, toutes les entités sont recalculées. Un code entité inconnu fait refuser la demande." },
-  "rapport": { sys: "bi", t: "Rapport Transcoding comptable", d: "Le rapport Power BI branché sur les tables publiées.",
-    sert: "Explorer la balance, vérifier les taux, suivre les anomalies et récupérer l'import.",
-    note: "Lecture seule. Il reflète le dernier run publié." },
-  "attente": { sys: "dk", t: "Compte d'attente 471000", d: "Le compte Operis qui reçoit les montants dont le compte ou le partenaire n'a pas pu être déterminé.",
-    sert: "Garder l'import complet en montant pendant qu'on corrige.",
-    note: "Chaque montant en attente a sa ligne dans Santé des données. Le numéro est un paramètre de la transco." }
-};
-const SYS = { bc: "Business Central", sp: "SharePoint", dk: "Dataiku + BigQuery", pa: "FinCenter Lite", bi: "Power BI" };
-const LABELS = [["grain", "Une ligne ="], ["lu", "Ce qu'on lit"], ["sert", "À quoi ça sert"], ["note", "À savoir"]];
-
 (() => {
-  /* Panneau de fiche */
-  const panel = document.getElementById('info');
-  const dl = document.getElementById('info-dl');
-  let current = null;
-  const fill = el => {
-    const f = INFO[el.dataset.i];
-    if (!f) return;
-    if (current) current.classList.remove('on');
-    current = el; el.classList.add('on');
-    const sys = document.getElementById('info-sys');
-    sys.className = 'src sys ' + f.sys;
-    sys.textContent = SYS[f.sys];
-    document.getElementById('info-title').textContent = f.t;
-    document.getElementById('info-def').textContent = f.d;
-    dl.replaceChildren(...LABELS.filter(([k]) => f[k]).map(([k, label]) => {
-      const div = document.createElement('div');
-      const dt = document.createElement('dt'); dt.textContent = label;
-      const dd = document.createElement('dd'); dd.textContent = f[k];
-      div.append(dt, dd); return div;
-    }));
-    panel.classList.add('open');
-  };
-  const close = () => { panel.classList.remove('open'); if (current) current.classList.remove('on'); current = null; };
-  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
-  document.querySelectorAll('[data-i]').forEach(el => {
-    if (fine) el.addEventListener('mouseenter', () => fill(el));
-    el.addEventListener('click', () => fill(el));
-    el.addEventListener('focus', () => fill(el));
-  });
-  panel.querySelector('.x').addEventListener('click', close);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
-
   /* Onglets */
   const tabs = [...document.querySelectorAll('[role="tab"]')];
   const show = (id, focus) => {
@@ -803,6 +773,10 @@ const LABELS = [["grain", "Une ligne ="], ["lu", "Ce qu'on lit"], ["sert", "À q
       const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
       if (d) show(tabs[(i + d + tabs.length) % tabs.length].getAttribute('aria-controls'), true);
     });
+  });
+  addEventListener('hashchange', () => {
+    const id = location.hash.slice(1);
+    if (tabs.some(t => t.getAttribute('aria-controls') === id)) { show(id); window.scrollTo(0, 0); }
   });
   const start = location.hash.slice(1);
   show(tabs.some(t => t.getAttribute('aria-controls') === start) ? start : 'flux');
