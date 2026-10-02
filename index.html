@@ -208,30 +208,16 @@ td .pill { display: inline-block; }
 .val.alt { background: var(--wait-bg); color: var(--wait); }
 a { color: var(--brand); }
 
-/* L'essentiel : deux sources en colonnes, trois moments en lignes */
-.context { max-width: 78ch; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--brand); border-radius: 8px; padding: 14px 16px; display: grid; gap: 8px; }
-.matrix { display: grid; grid-template-columns: 180px minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
-.matrix > div { border-radius: 8px; padding: 12px 14px; display: grid; gap: 6px; align-content: start; font-size: 15px; min-width: 0; }
-.matrix .head { font: 600 17px/1.25 var(--f-display); }
-.matrix .head span, .matrix .moment span { display: block; font: 400 14px/1.4 var(--f-body); opacity: .9; }
-.matrix .h-bc { background: var(--z-bc); color: var(--k-bc); }
-.matrix .h-sp { background: var(--z-sp); color: var(--k-sp); }
-.matrix .moment { font: 600 17px/1.25 var(--f-display); color: var(--brand); padding-left: 0; }
-.matrix .moment span { color: var(--muted); }
-.matrix .c-bc, .matrix .c-sp, .matrix .c-all { background: var(--surface); border: 1px solid var(--line); }
-.matrix .c-bc { border-top: 3px solid var(--k-bc); }
-.matrix .c-sp { border-top: 3px solid var(--k-sp); }
-.matrix .c-all { grid-column: 2 / 4; border-top: 3px solid var(--k-bi); }
-.matrix .rule { font-size: 14px; color: var(--muted); }
-.matrix .corner { padding: 0; }
-.matrix .row { display: contents; }
-@media (max-width: 760px) {
-  .matrix { grid-template-columns: minmax(0, 1fr); }
-  .matrix .corner, .matrix .head { display: none; }
-  .matrix .c-all { grid-column: auto; }
-  .matrix .c-bc::before { content: "Business Central"; font: 600 13px/1 var(--f-display); letter-spacing: .06em; text-transform: uppercase; color: var(--k-bc); }
-  .matrix .c-sp::before { content: "SharePoint"; font: 600 13px/1 var(--f-display); letter-spacing: .06em; text-transform: uppercase; color: var(--k-sp); }
-}
+/* L'essentiel : une seule largeur pour tout l'onglet, tableaux compris */
+#essentiel { max-width: 760px; }
+#essentiel > div { display: grid; gap: 10px; }
+#essentiel ul, #essentiel ol { margin: 0; padding-left: 20px; }
+#essentiel li { margin: 4px 0; }
+.moments th.bc { color: var(--k-bc); box-shadow: inset 0 -3px var(--k-bc); }
+.moments th.sp { color: var(--k-sp); box-shadow: inset 0 -3px var(--k-sp); }
+.moments td:first-child { width: 120px; }
+@media (max-width: 560px) { .moments td:first-child { width: 84px; } .moments th, .moments td { padding: 8px; } }
+.moments td:first-child .sub { font-size: 13px; }
 
 /* Questions */
 .faq { display: grid; gap: 22px; max-width: 78ch; }
@@ -264,64 +250,41 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
 
 <!-- ============ L'essentiel ============ -->
 <section class="panel" id="essentiel" role="tabpanel" aria-labelledby="tab-essentiel">
-<div class="context">
+<div>
   <h2>En début de mois, la nuit a déjà tout ramené</h2>
-  <p>La transco se lance en général au début du mois M+1. À ce moment, la mise à jour de la nuit a déjà relu tout ce qui a été saisi pour M dans Business Central.</p>
-  <p>Relire le grand livre au lancement ne change donc le résultat que si quelqu'un a corrigé des écritures datées de M, ou d'avant, depuis la nuit dernière. Les référentiels SharePoint, eux, ne sont jamais relus seuls. Il faut cocher « Référentiels » pour qu'une saisie compte.</p>
+  <p>La transco se lance en général au début du mois M+1. La mise à jour de la nuit a alors déjà relu tout ce qui a été saisi pour M dans Business Central.</p>
+  <p>Cocher « Grand livre » ne change le résultat que si quelqu'un a corrigé des écritures de M, ou d'avant, depuis la nuit. Les listes SharePoint ne sont jamais relues seules. Une saisie n'y compte que si « Référentiels » est coché.</p>
 </div>
 
 <div>
-<h2 style="margin-bottom:12px">Deux sources, trois moments</h2>
-<div class="matrix" role="table" aria-label="Ce qui se passe pour chaque source à chaque moment">
-  <div class="row" role="row">
-  <div class="corner" role="cell"></div>
-  <div class="head h-bc" role="columnheader">Business Central<span>Ce que les comptables saisissent : écritures, plan comptable et son numéro 2, factures d'achat, fournisseurs.</span></div>
-  <div class="head h-sp" role="columnheader">SharePoint mo-finance<span>Ce que la Finance tenait sur Excel avant l'import : entités, comptes Operis, clés de lettrage, activités, devises, ajustements, balance N‑1.</span></div>
-  </div>
-
-  <div class="row" role="row">
-  <div class="moment" role="rowheader">La nuit<span>Automatique, à 6 h 13 l'été, 5 h 13 l'hiver.</span></div>
-  <div class="c-bc" role="cell"><p>Relit le grand livre, le plan comptable et la devise locale de toutes les sociétés.</p><p class="rule">Les factures d'achat et les fournisseurs, eux, sont relus toutes les heures, à la demie.</p></div>
-  <div class="c-sp" role="cell"><p>Rien. Les listes ne sont jamais relues automatiquement.</p></div>
-  </div>
-  <div class="row" role="row">
-
-  <div class="moment" role="rowheader">La relance<span>À la demande, dans FinCenter Lite.</span></div>
-  <div class="c-bc" role="cell"><p>« Grand livre » coché : relit les écritures saisies ou modifiées depuis la dernière lecture.</p><p class="rule">Décoché, le calcul part de la dernière copie, celle de la nuit au plus tard.</p></div>
-  <div class="c-sp" role="cell"><p>« Référentiels » coché : relit toutes les listes et la balance N‑1.</p><p class="rule">Décoché, le calcul garde la dernière lecture et ne voit pas les saisies récentes.</p></div>
-  </div>
-  <div class="row" role="row">
-
-  <div class="moment" role="rowheader">Le rapport<span>Power BI.</span></div>
-  <div class="c-all" role="cell" aria-colspan="2"><p>Montre le résultat de la dernière relance, le même pour tout le monde. La mise à jour de la nuit ne recalcule pas la transco. Le résultat ne change qu'avec une relance.</p></div>
-  </div>
-</div>
-</div>
-
-<div class="blind">
-  <h2>Savoir que la relance est finie</h2>
-  <p>Après l'envoi, la demande est « En calcul » dans FinCenter Lite. À la fin, la personne qui l'a lancée reçoit un message Teams : Terminé, Terminé avec avertissement, ou Échec. En cas d'échec, transmettre le numéro de run que donne le message.</p>
-  <p>Ouvrir ensuite la page Runs du rapport. Votre run doit être en tête, avec sa date de calcul. Tant qu'il n'y est pas, le rapport montre encore le calcul précédent.</p>
-  <p>Sans réponse de Dataiku au bout de 30 min, la demande passe en Erreur, « délai dépassé », et un message Teams le signale. Cela arrive par exemple quand une autre relance tournait déjà et que la vôtre a été écartée. Relancer.</p>
-  <p>Comptez environ 12 min pour toutes les entités avec grand livre et référentiels, 4 min pour une entité seule sans référentiels.</p>
-</div>
-
-<div>
-<h2 style="margin-bottom:12px">Les mises à jour automatiques</h2>
+<h2>Deux sources, trois moments</h2>
 <div class="table-scroll">
-<table>
-  <thead><tr><th>Source</th><th>Quand</th><th>Bon à savoir</th></tr></thead>
+<table class="moments">
+  <thead><tr><th></th><th class="bc">Business Central</th><th class="sp">SharePoint mo&#8209;finance</th></tr></thead>
   <tbody>
-    <tr><td>Grand livre, plan comptable, paramètres comptabilité</td><td>Chaque nuit, à 6 h 13 l'été et 5 h 13 l'hiver, toutes les sociétés, en incrémental</td><td>Relus aussi à la relance si « Grand livre » est coché</td></tr>
-    <tr><td>Factures d'achat et fournisseurs</td><td>Toutes les heures, à la demie</td><td>Une facture saisie dans l'heure peut sortir sans partenaire. Relancer une heure plus tard suffit.</td></tr>
-    <tr><td>Sociétés Business Central</td><td>Dimanche et lundi à 6 h</td><td>Une société ajoutée au périmètre par l'exploitant est prise tout de suite</td></tr>
-    <tr><td>Listes SharePoint Finance</td><td><b>Jamais automatiquement</b></td><td>Relues seulement si « Référentiels » est coché à la relance</td></tr>
-    <tr><td>Balance N‑1</td><td>Avec les listes, si « Référentiels » est coché</td><td>À remplacer par la Finance une fois par an, en début d'exercice</td></tr>
-    <tr><td>Rapport Power BI</td><td>À la fin de chaque relance</td><td>Le message Teams prévient de la fin</td></tr>
+    <tr><td>La nuit<span class="sub">6 h 13 l'été, 5 h 13 l'hiver</span></td><td>Relit le grand livre, le plan comptable et la devise de toutes les sociétés.</td><td>Rien.</td></tr>
+    <tr><td>La relance<span class="sub">FinCenter Lite</span></td><td>« Grand livre » coché, relit ce qui a changé depuis la dernière lecture. Décoché, part de la copie de la nuit.</td><td>« Référentiels » coché, relit toutes les listes et la balance N‑1. Décoché, ignore les saisies récentes.</td></tr>
+    <tr><td>Le rapport<span class="sub">Power BI</span></td><td colspan="2">Montre la dernière relance, la même pour tout le monde. La nuit ne recalcule pas la transco.</td></tr>
   </tbody>
 </table>
 </div>
-<p class="hint">Les heures du rapport sont en UTC. Ajouter 2 h l'été, 1 h l'hiver.</p>
+<p>D'autres données suivent leur propre rythme.</p>
+<ul>
+  <li><b>Factures d'achat et fournisseurs</b>, toutes les heures à la demie. Une facture saisie dans l'heure peut sortir sans partenaire. Relancer une heure plus tard.</li>
+  <li><b>Sociétés Business Central</b>, dimanche et lundi à 6 h. Une société que l'exploitant ajoute au périmètre compte tout de suite.</li>
+  <li><b>Balance N‑1</b>, remplacée par la Finance une fois par an, en début d'exercice.</li>
+</ul>
+<p class="hint">Le rapport affiche les heures en UTC. Ajouter 2 h l'été, 1 h l'hiver.</p>
+</div>
+
+<div>
+<h2>Après une relance</h2>
+<ol>
+  <li>FinCenter Lite affiche « En calcul ». Compter 12 min pour toutes les entités avec grand livre et référentiels, 4 min pour une entité seule sans référentiels.</li>
+  <li>La personne qui a lancé reçoit un message Teams : Terminé, Terminé avec avertissement ou Échec. En cas d'échec, transmettre le numéro de run du message.</li>
+  <li>Dans le rapport, page Runs, le run doit être en tête avec sa date de calcul. Sinon, le rapport montre encore le calcul précédent.</li>
+</ol>
+<p>Sans réponse de Dataiku au bout de 30 min, la demande passe en Erreur, « délai dépassé », et un message Teams le signale. Cela arrive par exemple quand une autre relance tournait déjà. Relancer.</p>
 </div>
 </section>
 
