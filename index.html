@@ -208,6 +208,37 @@ td .pill { display: inline-block; }
 .val.alt { background: var(--wait-bg); color: var(--wait); }
 a { color: var(--brand); }
 
+/* L'essentiel : deux sources en colonnes, trois moments en lignes */
+.context { max-width: 78ch; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--brand); border-radius: 8px; padding: 14px 16px; display: grid; gap: 8px; }
+.matrix { display: grid; grid-template-columns: 180px minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.matrix > div { border-radius: 8px; padding: 12px 14px; display: grid; gap: 6px; align-content: start; font-size: 15px; min-width: 0; }
+.matrix .head { font: 600 17px/1.25 var(--f-display); }
+.matrix .head span, .matrix .moment span { display: block; font: 400 14px/1.4 var(--f-body); opacity: .9; }
+.matrix .h-bc { background: var(--z-bc); color: var(--k-bc); }
+.matrix .h-sp { background: var(--z-sp); color: var(--k-sp); }
+.matrix .moment { font: 600 17px/1.25 var(--f-display); color: var(--brand); padding-left: 0; }
+.matrix .moment span { color: var(--muted); }
+.matrix .c-bc, .matrix .c-sp, .matrix .c-all { background: var(--surface); border: 1px solid var(--line); }
+.matrix .c-bc { border-top: 3px solid var(--k-bc); }
+.matrix .c-sp { border-top: 3px solid var(--k-sp); }
+.matrix .c-all { grid-column: 2 / 4; border-top: 3px solid var(--k-bi); }
+.matrix .rule { font-size: 14px; color: var(--muted); }
+.matrix .corner { padding: 0; }
+.matrix .row { display: contents; }
+@media (max-width: 760px) {
+  .matrix { grid-template-columns: minmax(0, 1fr); }
+  .matrix .corner, .matrix .head { display: none; }
+  .matrix .c-all { grid-column: auto; }
+  .matrix .c-bc::before { content: "Business Central"; font: 600 13px/1 var(--f-display); letter-spacing: .06em; text-transform: uppercase; color: var(--k-bc); }
+  .matrix .c-sp::before { content: "SharePoint"; font: 600 13px/1 var(--f-display); letter-spacing: .06em; text-transform: uppercase; color: var(--k-sp); }
+}
+
+/* Questions */
+.faq { display: grid; gap: 22px; max-width: 78ch; }
+.faq article { display: grid; gap: 8px; padding-top: 18px; border-top: 1px solid var(--line); }
+.faq ul { margin: 0; padding-left: 18px; }
+.faq li { margin: 3px 0; }
+
 footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
 
 </style>
@@ -218,18 +249,83 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
 <header>
   <div class="eyebrow">Transco Operis</div>
   <h1>De Business Central à la balance Operis</h1>
-  <p>Comment la transco produit l'import Operis, quoi préparer à chaque clôture, et quoi faire quand une donnée manque.</p>
+  <p>D'où viennent les chiffres, quand ils sont mis à jour, quoi préparer à chaque clôture, et quoi faire quand une donnée manque.</p>
 </header>
 
 <div class="tabs" role="tablist" aria-label="Sections">
-  <button role="tab" id="tab-flux" aria-controls="flux" aria-selected="true">Le flux</button>
+  <button role="tab" id="tab-essentiel" aria-controls="essentiel" aria-selected="true">L'essentiel</button>
+  <button role="tab" id="tab-flux" aria-controls="flux" aria-selected="false">Le flux</button>
   <button role="tab" id="tab-exercice" aria-controls="exercice" aria-selected="false">Mode opératoire</button>
   <button role="tab" id="tab-relance" aria-controls="relance" aria-selected="false">Relancer</button>
   <button role="tab" id="tab-transco" aria-controls="transco" aria-selected="false">La transcodification</button>
   <button role="tab" id="tab-erreurs" aria-controls="erreurs" aria-selected="false">Les erreurs</button>
+  <button role="tab" id="tab-questions" aria-controls="questions" aria-selected="false">Questions</button>
 </div>
 
-<!-- ============ Onglet 1 : le flux ============ -->
+<!-- ============ L'essentiel ============ -->
+<section class="panel" id="essentiel" role="tabpanel" aria-labelledby="tab-essentiel">
+<div class="context">
+  <h2>En début de mois, la nuit a déjà tout ramené</h2>
+  <p>La transco se lance en général au début du mois M+1. À ce moment, la mise à jour de la nuit a déjà relu tout ce qui a été saisi pour M dans Business Central.</p>
+  <p>Relire le grand livre au lancement ne change donc le résultat que si quelqu'un a corrigé des écritures datées de M, ou d'avant, depuis la nuit dernière. Les référentiels SharePoint, eux, ne sont jamais relus seuls. Il faut cocher « Référentiels » pour qu'une saisie compte.</p>
+</div>
+
+<div>
+<h2 style="margin-bottom:12px">Deux sources, trois moments</h2>
+<div class="matrix" role="table" aria-label="Ce qui se passe pour chaque source à chaque moment">
+  <div class="row" role="row">
+  <div class="corner" role="cell"></div>
+  <div class="head h-bc" role="columnheader">Business Central<span>Ce que les comptables saisissent : écritures, plan comptable et son numéro 2, factures d'achat, fournisseurs.</span></div>
+  <div class="head h-sp" role="columnheader">SharePoint mo-finance<span>Ce que la Finance tenait sur Excel avant l'import : entités, comptes Operis, clés de lettrage, activités, devises, ajustements, balance N‑1.</span></div>
+  </div>
+
+  <div class="row" role="row">
+  <div class="moment" role="rowheader">La nuit<span>Automatique, à 6 h 13 l'été, 5 h 13 l'hiver.</span></div>
+  <div class="c-bc" role="cell"><p>Relit le grand livre, le plan comptable et la devise locale de toutes les sociétés.</p><p class="rule">Les factures d'achat et les fournisseurs, eux, sont relus toutes les heures, à la demie.</p></div>
+  <div class="c-sp" role="cell"><p>Rien. Les listes ne sont jamais relues automatiquement.</p></div>
+  </div>
+  <div class="row" role="row">
+
+  <div class="moment" role="rowheader">La relance<span>À la demande, dans FinCenter Lite.</span></div>
+  <div class="c-bc" role="cell"><p>« Grand livre » coché : relit les écritures saisies ou modifiées depuis la dernière lecture.</p><p class="rule">Décoché, le calcul part de la dernière copie, celle de la nuit au plus tard.</p></div>
+  <div class="c-sp" role="cell"><p>« Référentiels » coché : relit toutes les listes et la balance N‑1.</p><p class="rule">Décoché, le calcul garde la dernière lecture et ne voit pas les saisies récentes.</p></div>
+  </div>
+  <div class="row" role="row">
+
+  <div class="moment" role="rowheader">Le rapport<span>Power BI.</span></div>
+  <div class="c-all" role="cell" aria-colspan="2"><p>Montre le résultat de la dernière relance, le même pour tout le monde. La mise à jour de la nuit ne recalcule pas la transco. Le résultat ne change qu'avec une relance.</p></div>
+  </div>
+</div>
+</div>
+
+<div class="blind">
+  <h2>Savoir que la relance est finie</h2>
+  <p>Après l'envoi, la demande est « En calcul » dans FinCenter Lite. À la fin, la personne qui l'a lancée reçoit un message Teams : Terminé, Terminé avec avertissement, ou Échec. En cas d'échec, transmettre le numéro de run que donne le message.</p>
+  <p>Ouvrir ensuite la page Runs du rapport. Votre run doit être en tête, avec sa date de calcul. Tant qu'il n'y est pas, le rapport montre encore le calcul précédent.</p>
+  <p>Sans réponse de Dataiku au bout de 30 min, la demande passe en Erreur, « délai dépassé », et un message Teams le signale. Cela arrive par exemple quand une autre relance tournait déjà et que la vôtre a été écartée. Relancer.</p>
+  <p>Comptez environ 12 min pour toutes les entités avec grand livre et référentiels, 4 min pour une entité seule sans référentiels.</p>
+</div>
+
+<div>
+<h2 style="margin-bottom:12px">Les mises à jour automatiques</h2>
+<div class="table-scroll">
+<table>
+  <thead><tr><th>Source</th><th>Quand</th><th>Bon à savoir</th></tr></thead>
+  <tbody>
+    <tr><td>Grand livre, plan comptable, paramètres comptabilité</td><td>Chaque nuit, à 6 h 13 l'été et 5 h 13 l'hiver, toutes les sociétés, en incrémental</td><td>Relus aussi à la relance si « Grand livre » est coché</td></tr>
+    <tr><td>Factures d'achat et fournisseurs</td><td>Toutes les heures, à la demie</td><td>Une facture saisie dans l'heure peut sortir sans partenaire. Relancer une heure plus tard suffit.</td></tr>
+    <tr><td>Sociétés Business Central</td><td>Dimanche et lundi à 6 h</td><td>Une société ajoutée au périmètre par l'exploitant est prise tout de suite</td></tr>
+    <tr><td>Listes SharePoint Finance</td><td><b>Jamais automatiquement</b></td><td>Relues seulement si « Référentiels » est coché à la relance</td></tr>
+    <tr><td>Balance N‑1</td><td>Avec les listes, si « Référentiels » est coché</td><td>À remplacer par la Finance une fois par an, en début d'exercice</td></tr>
+    <tr><td>Rapport Power BI</td><td>À la fin de chaque relance</td><td>Le message Teams prévient de la fin</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="hint">Les heures du rapport sont en UTC. Ajouter 2 h l'été, 1 h l'hiver.</p>
+</div>
+</section>
+
+<!-- ============ Le flux ============ -->
 <section class="panel" id="flux" role="tabpanel" aria-labelledby="tab-flux">
 <div>
 <div class="canvas-scroll">
@@ -394,8 +490,9 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
   <li><div class="step-body">
     <span class="when month">À chaque clôture</span>
     <h3>Mettre à jour les taux de change</h3>
-    <p>Ajouter les taux du mois dans <span class="src sp">SharePoint · Devises</span>, une ligne par devise vers l'EUR. Le run prend le taux le plus récent de chaque devise, les anciennes lignes peuvent rester.</p>
+    <p>Ajouter les taux du mois dans <span class="src sp">SharePoint · Devises</span>, une ligne par devise vers l'EUR. Les anciennes lignes peuvent rester. Pour chaque devise, le run prend le dernier taux daté au plus tard du dernier jour de la période calculée. Relancer un mois passé reprend donc ses propres taux, même si des taux plus récents ont été ajoutés depuis.</p>
     <p class="fail out">Deux valeurs différentes pour la même devise à la même date : la devise n'a plus de taux, et toutes les sociétés qui l'utilisent sortent de l'import.</p>
+    <p class="fail skip">Dernier taux daté d'avant le début du mois : le run convertit à ce taux, et Santé des données signale chaque société dont des écritures l'utilisent.</p>
     <label class="check"><input type="checkbox" id="todo-4"> Fait</label>
   </div></li>
 
@@ -403,7 +500,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
     <span class="when month">À chaque clôture</span>
     <h3>Lancer la transco</h3>
     <p>Dans <span class="src pa">FinCenter Lite</span>, avec les réglages « La clôture commence » de l'onglet <a href="#relance">Relancer</a>. Les référentiels doivent être cochés pour que les nouveaux taux soient lus.</p>
-    <p>Le résultat s'affiche dans <span class="src bi">Power BI · Runs</span>.</p>
+    <p>Un message Teams prévient de la fin. Le run apparaît alors en tête de <span class="src bi">Power BI · Runs</span>.</p>
     <label class="check"><input type="checkbox" id="todo-5"> Fait</label>
   </div></li>
 
@@ -443,7 +540,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
   <thead><tr><th>Situation</th><th>Entités</th><th>Grand livre</th><th>Mode</th><th>Référentiels</th><th>Recalcule</th></tr></thead>
   <tbody>
     <tr><td>La clôture commence<span class="sub">Premier run du mois clôturé. Taux saisis, et balance N‑1 déposée en début d'exercice.</span></td><td>Aucune</td><td><span class="val on">Coché</span></td><td>Incrémental</td><td><span class="val on">Coché</span></td><td>Toutes</td></tr>
-    <tr><td>Correction dans Business Central<span class="sub">Un <code>No_2</code>, une écriture, une devise locale.</span></td><td>Les entités corrigées</td><td><span class="val on">Coché</span></td><td>Incrémental</td><td><span class="val off">Décoché</span></td><td>Ces entités seulement, en quelques minutes</td></tr>
+    <tr><td>Correction dans Business Central<span class="sub">Un <code>No_2</code>, une écriture, une devise locale.</span></td><td>Les entités corrigées</td><td><span class="val on">Coché</span></td><td>Incrémental</td><td><span class="val off">Décoché</span></td><td>Ces entités seulement, en 4 min environ pour une entité</td></tr>
     <tr><td>Correction dans SharePoint<span class="sub">Taux, compte Operis, clé de lettrage, activité, ajustement, entité, balance N‑1.</span></td><td>Peu importe</td><td><span class="val off">Décoché</span></td><td>Sans effet</td><td><span class="val on">Coché</span></td><td>Toutes</td></tr>
     <tr><td>Corrections des deux côtés</td><td>Les entités corrigées dans BC</td><td><span class="val on">Coché</span></td><td>Incrémental</td><td><span class="val on">Coché</span></td><td>Toutes</td></tr>
     <tr><td>Une entité ne colle pas à Business Central<span class="sub">Santé des données ne signale rien. Une écriture a sans doute été supprimée dans BC, ce que l'incrémental ne voit pas.</span></td><td>Une seule</td><td><span class="val on">Coché</span></td><td><span class="val alt">Réconciliation</span></td><td><span class="val off">Décoché</span></td><td>Cette entité, après relecture complète de son grand livre</td></tr>
@@ -455,6 +552,17 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
 <div class="blind">
   <h2>Partiel ou complet</h2>
   <p>Le run ne recalcule que les entités choisies si les référentiels sont décochés et que la période est celle du dernier run publié. Sinon, il recalcule toutes les entités, quelle que soit la sélection. On ne peut pas le forcer. La page Runs affiche la portée de chaque run.</p>
+  <p>Il n'existe qu'une transco pour tout le monde. Relancer un autre mois, ou toutes les entités, remplace ce que chacun voit dans le rapport jusqu'à la relance suivante.</p>
+</div>
+
+<div class="blind">
+  <h2>Combien de temps</h2>
+  <ul>
+    <li><b>Toutes les entités, grand livre et référentiels cochés.</b> 12 min. Le grand livre des douze entités en prend plus de la moitié.</li>
+    <li><b>Une entité, grand livre coché, référentiels décochés.</b> 4 min.</li>
+    <li><b>Réconciliation d'une entité.</b> 2 à 5 min pour relire son grand livre, selon sa taille, plus 2 à 3 min de calcul.</li>
+  </ul>
+  <p>Mesuré du 29 septembre au 1er octobre 2026.</p>
 </div>
 
 <div>
@@ -494,7 +602,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
 
   <li><div class="step-body">
     <h3>Convertir en EUR</h3>
-    <p>La devise de la société vient de <span class="src bc">BC · Paramètres comptabilité</span>, le taux du dernier publié dans <span class="src sp">SharePoint · Devises</span>. Le taux, sa date et sa source restent visibles ligne par ligne.</p>
+    <p>La devise de la société vient de <span class="src bc">BC · Paramètres comptabilité</span>. Le taux est le dernier publié dans <span class="src sp">SharePoint · Devises</span> au plus tard le dernier jour de la période. Le taux, sa date et sa source restent visibles ligne par ligne.</p>
     <p>On convertit avant de chercher le compte, pour qu'une écriture sans compte Operis ait quand même un montant EUR à mettre en attente.</p>
     <p class="fail out">Pas de taux pour la devise : toute la société sort de l'import, balance N‑1 et ajustements compris. Sinon ces seules lignes annuleraient à tort sa position Operis.</p>
   </div></li>
@@ -606,6 +714,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
     <tr><td>Facture ou fournisseur en double</td><td><span class="pill wait">Attente</span></td><td>Business Central, factures d'achat et fournisseurs</td></tr>
     <tr><td>Code partenaire d'entité manquant (181500)</td><td><span class="pill wait">Attente</span></td><td>SharePoint, Entités</td></tr>
     <tr><td>Taux absent ou en double<span class="sub">Toute la société sort.</span></td><td><span class="pill out">Exclue</span></td><td>SharePoint, Devises</td></tr>
+    <tr><td>Taux plus ancien que la période<span class="sub">Les montants restent sur leurs comptes.</span></td><td><span class="pill skip">Alerte</span></td><td>SharePoint, Devises</td></tr>
     <tr><td>Devise locale manquante</td><td><span class="pill out">Exclue</span></td><td>Business Central, Paramètres comptabilité</td></tr>
     <tr><td>Code entité en double</td><td><span class="pill out">Exclue</span></td><td>SharePoint, Entités</td></tr>
     <tr><td>Balance N‑1 hors EUR, ou compte N‑1 inconnu</td><td><span class="pill out">Exclue</span> / <span class="pill wait">Attente</span></td><td>Le fichier dans <code>operis/balance/</code></td></tr>
@@ -627,6 +736,66 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
     <li><b>Extourne dans le même mois.</b> Une écriture et son extourne datées du même mois s'annulent. Contre-passer une transaction dans Business Central extourne toujours à la date d'origine.</li>
     <li><b>Balance N‑1 d'un autre exercice.</b> Le fichier Operis ne porte pas d'exercice, le run prend celui qui est dans <code>operis/balance/</code>.</li>
   </ul>
+</div>
+</section>
+
+<!-- ============ Questions ============ -->
+<section class="panel" id="questions" role="tabpanel" aria-labelledby="tab-questions">
+<p class="lead">Les questions posées à la réunion du 30 septembre 2026.</p>
+
+<div class="faq">
+  <article>
+    <h3>J'ai fait la transco de juin. Puis-je relancer septembre en incrémental ?</h3>
+    <p>Oui. L'incrémental relit tout ce qui a été saisi ou modifié dans Business Central depuis la lecture précédente, quelle que soit la période. La période ne sert qu'au calcul, qui garde les écritures datées au plus tard de son dernier jour.</p>
+  </article>
+
+  <article>
+    <h3>Quand faut-il une réconciliation ?</h3>
+    <p>Rarement. Elle sert à repartir de zéro sur une entité, quand le rapport ne colle plus à Business Central sans que Santé des données signale rien. Une écriture supprimée dans Business Central en est la cause habituelle, car l'incrémental ne voit pas les suppressions. Une société qu'on ajoute passe par cette lecture complète au moment de l'ajout, sans rien à faire de plus.</p>
+    <p>Elle relit tout le grand livre de l'entité, pas seulement les modifications. Comptez 2 à 5 min selon sa taille, avant le calcul. Une seule entité à la fois.</p>
+  </article>
+
+  <article>
+    <h3>Une période est rouverte et une écriture y est repassée en janvier. L'incrémental la voit-il ?</h3>
+    <p>Oui. L'écriture repassée est une nouvelle écriture, et Business Central lui donne comme date de modification le jour où elle est passée. L'incrémental suit cette date, pas la date comptable. Relancer ensuite la période concernée pour que l'écriture compte.</p>
+    <p>C'est ce que fait le programme. Un essai réel dans Business Central reste à faire.</p>
+  </article>
+
+  <article>
+    <h3>Quel taux s'applique quand on relance une période passée ?</h3>
+    <p>Pour chaque devise, le dernier taux de <span class="src sp">SharePoint · Devises</span> daté au plus tard du dernier jour de la période. Relancer juin en octobre reprend donc les taux de juin, pas ceux saisis depuis.</p>
+    <p>Si le dernier taux est daté d'avant le début du mois, le run convertit quand même à ce taux. Santé des données signale alors chaque société dont des écritures l'utilisent. Le taux appliqué, sa date et sa source sont dans la page Contrôle et change.</p>
+  </article>
+
+  <article>
+    <h3>Que se passe-t-il si on change un numéro fournisseur dans Business Central ?</h3>
+    <p>Le partenaire ne vient jamais directement du grand livre. Le run cherche la facture d'achat qui porte le numéro de document de l'écriture, puis le fournisseur de cette facture dans Business Central. Il retient son numéro s'il figure dans <span class="src sp">SharePoint · Entités groupe</span>. Sinon, l'écriture reste sans partenaire, sans alerte.</p>
+    <p>Le partenaire suit donc le numéro de fournisseur que porte la facture. Reste à vérifier par un essai si Business Central reporte un nouveau numéro sur les factures déjà passées, et ce que deviennent les mois déjà calculés quand on les relance.</p>
+  </article>
+
+  <article>
+    <h3>Pourquoi les paiements, avoirs et OD d'un fournisseur groupe n'ont-ils pas de partenaire ?</h3>
+    <p>Seules les écritures issues d'une facture d'achat trouvent leur partenaire. Un paiement, un avoir ou une OD n'a pas de facture d'achat derrière son numéro de document. Le montant reste donc sur le compte, sans partenaire.</p>
+    <p>Le run ne le signale pas, parce qu'un compte fournisseur sans partenaire est normal pour un fournisseur hors groupe. Rien ne distingue les deux cas.</p>
+    <p>Pour les repérer, ouvrir la Vue d'ensemble sur l'entité et le compte fournisseur. Sur la ligne sans partenaire, clic droit › Extraire › Contributions. La page liste les écritures de cette ligne avec leur numéro de document et leur libellé. Les paiements, avoirs et OD y apparaissent.</p>
+  </article>
+
+  <article>
+    <h3>Pourquoi le 471000 n'apparaît-il pas ?</h3>
+    <p>Quand sa variation est nulle, le compte d'attente n'a pas de ligne d'import, et la Vue d'ensemble le masque avec ses réglages par défaut. Le signet « Toutes les lignes issues des données » le montre.</p>
+    <p>Un 471000 absent du rapport ne prouve pas que rien n'est passé par le compte d'attente. Santé des données reste la liste de référence.</p>
+  </article>
+
+  <article>
+    <h3>Je relance une seule entité. Que deviennent les autres ?</h3>
+    <p>Elles gardent leur dernier calcul, si la période est celle du dernier run et que les référentiels sont décochés. Sinon, le run recalcule toutes les entités.</p>
+    <p>Il n'existe qu'une transco pour tout le monde. Relancer juin fait passer tout le rapport sur juin, pour chacun, jusqu'à la relance suivante.</p>
+  </article>
+
+  <article>
+    <h3>L'heure affichée dans le rapport est-elle la nôtre ?</h3>
+    <p>Non, le rapport affiche les heures en UTC. Ajouter 2 h l'été et 1 h l'hiver pour l'heure de Paris.</p>
+  </article>
 </div>
 </section>
 
@@ -659,7 +828,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
     if (tabs.some(t => t.getAttribute('aria-controls') === id)) { show(id); window.scrollTo(0, 0); }
   });
   const start = location.hash.slice(1);
-  show(tabs.some(t => t.getAttribute('aria-controls') === start) ? start : 'flux');
+  show(tabs.some(t => t.getAttribute('aria-controls') === start) ? start : 'essentiel');
   if (start) window.scrollTo(0, 0);
 
   /* Pense-bête du mode opératoire, gardé dans le navigateur */
